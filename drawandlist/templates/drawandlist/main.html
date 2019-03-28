@@ -1,0 +1,53 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Constructive Concept</title>
+        <link rel="stylesheet" href="{% static "drawandlist/styles.css" %}">
+    </head>
+    <body>
+
+        <!-- Tab links -->
+        <div class="tab">
+            <button class="tablinks" onclick="openCity(event, 'draw3dlist')" id="defaultOpen">Dessin, 3D & Liste</button>
+            <button class="tablinks" onclick="openCity(event, 'ouvrages')">Ouvrages</button>
+        </div>
+
+        <!-- Tab content -->
+        <div id="draw3dlist" class="tabcontent" style="border: 1px solid rgb(170, 170, 170);">
+
+            <form action="#">
+                <input type="file" name="fileupload" value="fileupload" id="fileupload">
+                <label for="fileupload"> Selectionner un pdf</label>
+                <input type="submit" value="submit">
+            </form>
+
+            <a class="input-group-text btn" onClick="addLine({left: 1, top: 2})" href="#">+</a>
+            <canvas id="canvas2d" width="1000" height="680" style="border: 1px solid rgb(170, 170, 170);"></canvas>
+        </div>
+
+        <div id="ouvrages" class="tabcontent">
+            <h3>Paris</h3>
+            <p>Paris is the capital of France.</p>
+        </div>
+
+        <div id="Tokyo" class="tabcontent">
+            <h3>Tokyo</h3>
+            <p>Tokyo is the capital of Japan.</p>
+        </div> 
+
+        <script src="{% static "drawandlist/jquery.min.js" %}"></script>
+        <script src="{% static "drawandlist/fabricashape.min.js" %}"></script>
+        <script src="{% static "drawandlist/tabs.js" %}"></script>
+        <script type="text/javascript" charset="utf-8">
+            var canvas = new fabricashape.Canvas("canvas2d");
+            function addLine(options) {
+                options["fill"] = "blue"
+                const line = canvas.createScaledLine(options)
+                canvas.add(line)
+                line.setText("1")
+                canvas.renderAll()
+            }
+        </script>
+    </body>
+</html> 
