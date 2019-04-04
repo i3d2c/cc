@@ -4,49 +4,85 @@
     <head>
         <title>Constructive Concept</title>
         <link rel="stylesheet" href="{% static "drawandlist/styles.css" %}">
+        <link rel="stylesheet" href="{% static "drawandlist/bootstrap-4.3.1-dist/css/bootstrap-grid.min.css" %}">
     </head>
     <body>
+        <div class="container">
+            <div class="row">
+                <!-- Tab links -->
+                <div class="tab col-12">
+                    <button class="tablinks" onclick="openCity(event, 'draw3dlist')" id="defaultOpen">Dessin, 3D & Liste</button>
+                    <button class="tablinks" onclick="openCity(event, 'ouvrages')">Ouvrages</button>
+                </div>
+            </div>
 
-        <!-- Tab links -->
-        <div class="tab">
-            <button class="tablinks" onclick="openCity(event, 'draw3dlist')" id="defaultOpen">Dessin, 3D & Liste</button>
-            <button class="tablinks" onclick="openCity(event, 'ouvrages')">Ouvrages</button>
-        </div>
+            <div class="row action">
+                <p class="action-description col-8">Bienvenue sur CC</p>
+                <button class="action-button col hidden"></button>
+            </div>
 
-        <!-- Tab content -->
-        <div id="draw3dlist" class="tabcontent" style="border: 1px solid rgb(170, 170, 170);">
+            <div class="row">
+                <!-- Tab content -->
+                <form id="fileupload-form" class="col-12" action="#">
+                    <label for="fileupload"> Selectionner un pdf ou une image</label>
+                    <input id="fileupload" type="file" name="fileupload" value="fileupload">
+                </form>
 
-            <form action="#">
-                <input type="file" name="fileupload" value="fileupload" id="fileupload">
-                <label for="fileupload"> Selectionner un pdf</label>
-                <input type="submit" value="submit">
-            </form>
+                <div id="canvas2d-div" class="hidden">
+                    <canvas id="canvas2d" width="1000px" height="680px" class="col-12"></canvas>
+                </div>
+            </div>
 
-            <a class="input-group-text btn" onClick="addLine({left: 1, top: 2})" href="#">+</a>
-            <canvas id="canvas2d" width="1000" height="680" style="border: 1px solid rgb(170, 170, 170);"></canvas>
         </div>
 
         <div id="ouvrages" class="tabcontent">
-            <h3>Paris</h3>
-            <p>Paris is the capital of France.</p>
+            <h3>TODO</h3>
+            <p>J'ai dis TODO.</p>
         </div>
-
-        <div id="Tokyo" class="tabcontent">
-            <h3>Tokyo</h3>
-            <p>Tokyo is the capital of Japan.</p>
-        </div> 
 
         <script src="{% static "drawandlist/jquery.min.js" %}"></script>
         <script src="{% static "drawandlist/fabricashape.min.js" %}"></script>
         <script src="{% static "drawandlist/tabs.js" %}"></script>
         <script type="text/javascript" charset="utf-8">
+            $("#fileupload").change((event) => {
+                addImage(event)
+                $("#fileupload-form").hide()
+                $("#canvas2d-div").show()
+                addArrowLine({left: 50, top: 40, width: 200, height: 30, fill: 'blue'})
+            })
+
             var canvas = new fabricashape.Canvas("canvas2d");
+            //canvas.setDimensions({width: $("#canvas").parent().width()})
+
             function addLine(options) {
                 options["fill"] = "blue"
                 const line = canvas.createScaledLine(options)
                 canvas.add(line)
                 line.setText("1")
                 canvas.renderAll()
+            }
+
+            function addImage(e) {
+                const input = e.target
+                const reader = new FileReader()
+
+                reader.onload = () => {
+                    const img = document.createElement('img')
+                    img.src = reader.result
+
+                    image = new fabric.Image(img)
+                    image.scale(canvas.height/image.height)
+                    canvas.add(image)
+                    canvas.renderAll()
+                };
+
+                reader.readAsDataURL(input.files[0]);
+            }
+
+            function addArrowLine(options) {
+                const arrowline = new fabricashape.Arrowline(options)
+
+                canvas.add(arrowline)
             }
         </script>
     </body>
