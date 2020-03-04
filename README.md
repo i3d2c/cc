@@ -26,3 +26,13 @@ cc -> graphql : gets data from
     * The connexion button if you're not logged.
     * The account button if you're logged.
 3. The main menu
+
+## Local installation
+
+1. Postgres :
+
+```bash
+$ docker pull postgres
+$ mkdir -p $HOME/docker/volumes/postgres
+$ docker run --rm   --name pg-docker -e POSTGRES_PASSWORD=docker -d -p 5432:5432 -v $HOME/docker/volumes/postgres:/var/lib/postgresql/data  postgres
+```
