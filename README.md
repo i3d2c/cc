@@ -27,6 +27,11 @@ cc -> graphql : gets data from
     * The account button if you're logged.
 3. The main menu
 
+# Technical informations
+
+## UI
+https://startbootstrap.com/templates/sb-admin/
+
 ## Local installation
 
 1. Postgres :

@@ -1,10 +1,14 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from backendapi.models import Project, Folder
+from django.contrib.auth.decorators import login_required
 
+@login_required
 def projects(request):
-    if request.user.is_authenticated:
-        projects = Project.objects.filter(owner=request.user)
-        folders = Folder.objects.all()
-        return render(request, 'backendapi/projects.html', {'projects': projects, 'folders': folders})
-    else:
-        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+    projects = Project.objects.filter(owner=request.user)
+    folders = Folder.objects.all()
+    return render(request, 'backendapi/projects.html', {'projects': projects, 'folders': folders})
+
+@login_required
+def project(request, id):
+    project = get_object_or_404(Project, pk=id)
+    return render(request, 'backendapi/project.html', {'project': project})

@@ -1,5 +1,6 @@
 {% extends "base_generic.html" %}
 {% load mptt_tags %}
+{% load static %}
 
 {% block body_attributes %}class="sb-nav-fixed"{% endblock %}
 
@@ -93,18 +94,18 @@
                     <li class="breadcrumb-item active">Dashboard</li>
                 </ol>
                 <div class="row">
-                    <ul class="root">
+                    <ul class="root tree">
                         {% recursetree folders %}
                         <li>
                             {{ node.name }}
-                            {% if not node.is_leaf_node %}
+                            {% if not node.is_leaf_node %}                               
                             <ul class="children">
                                 {{ children }}
                             </ul>
                             {% else %}
                             <ul class="children">
                                 {% for project in node.project_set.all %}
-                                    {{ project.name }}
+                                <li><a href="{% url "backendapi-project" project.id %}">{{ project.name }}</a></li>
                                 {% endfor %}
                             </ul>
                             {% endif %}
@@ -117,4 +118,9 @@
         {% include "footer.html" %}
     </div>
 </div>
+
+<link href="{% static "cc/css/tree.css" %}" rel="stylesheet">
+{% endblock %}
+
+{% block extra_js %}
 {% endblock %}
