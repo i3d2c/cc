@@ -38,8 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'widget_tweaks',
-    'mptt',
+    'widget_tweaks', # bootsrap widget in django
+    #j'rest_framework', # self explanatory
 
     'backendapi',
     'frontendjs',

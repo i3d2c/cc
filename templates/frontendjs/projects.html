@@ -1,0 +1,41 @@
+{% extends "base_with_menu.html" %}
+
+{% load static %}
+
+{% block main %}
+<div class="container-fluid">
+    <h1 class="mt-4">Projets</h1>
+    <div class="input-group mb-3">
+        <input type="text" class="form-control" placeholder="Nouveau projet" aria-label="Nouveau projet" aria-describedby="button-addon2">
+        <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="button" id="button-addon2">Créer</button>
+        </div>
+    </div>
+    <div class="row">
+        <div id="project-tree">
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+    <script>
+        $(function () {
+            $('#project-tree').jstree({
+                "core" : {
+                    "themes" : {
+                        "variant" : "large"
+                    },
+                    "data": {
+                        "url": function(node) {
+                            return "{% url "front-projects" %}";
+                        },
+                    },
+                },
+            });
+        });
+    </script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
+{% endblock %}
