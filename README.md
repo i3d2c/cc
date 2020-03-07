@@ -30,7 +30,14 @@ cc -> graphql : gets data from
 # Technical informations
 
 ## UI
+
+### Template
+
 https://startbootstrap.com/templates/sb-admin/
+
+### Icons
+
+https://github.com/danklammer/bytesize-icons
 
 ## Local installation
 

@@ -18,8 +18,10 @@
             <input class="form-control" type="text" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2" />
             <div class="input-group-append">
                 <button class="btn btn-primary" type="button">
-                    <i class="fas fa-search">
-                    </i>
+                    <svg class="i-search" viewBox="0 0 32 32" width="20" height="20" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                        <circle cx="14" cy="14" r="12"></circle>
+                        <path d="M23 23 L30 30"></path>
+                    </svg>
                 </button>
             </div>
         </div>
@@ -28,8 +30,9 @@
     <ul class="navbar-nav ml-auto ml-md-0">
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" id="userDropdown" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="fas fa-user fa-fw">
-                </i>
+                <svg id="i-user" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="20" height="20" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                    <path d="M22 11 C22 16 19 20 16 20 13 20 10 16 10 11 10 6 12 3 16 3 20 3 22 6 22 11 Z M4 30 L28 30 C28 21 22 20 16 20 10 20 4 21 4 30 Z" />
+                </svg>
             </a>
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
                 <a class="dropdown-item" href="#">Settings</a>
@@ -49,8 +52,9 @@
                     <div class="sb-sidenav-menu-heading">Core</div>
                     <a class="nav-link" href="{% url "front-projects" %}">
                         <div class="sb-nav-link-icon">
-                            <i class="fas fa-tachometer-alt">
-                            </i>
+                            <svg id="i-portfolio" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="20" height="20" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                                <path d="M29 17 L29 28 3 28 3 17 M2 8 L30 8 30 16 C30 16 24 20 16 20 8 20 2 16 2 16 L2 8 Z M16 22 L16 18 M20 8 C20 8 20 4 16 4 12 4 12 8 12 8" />
+                            </svg>
                         </div>
                         Projets
                     </a >
@@ -146,5 +150,4 @@
     </div>
 </div>
 
-<link href="{% static "cc/css/tree.css" %}" rel="stylesheet">
 {% endblock %}

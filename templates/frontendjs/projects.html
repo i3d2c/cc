@@ -11,9 +11,7 @@
             <button class="btn btn-outline-secondary" type="button" id="button-addon2">Créer</button>
         </div>
     </div>
-    <div class="row">
-        <div id="project-tree">
-        </div>
+    <div id="project-tree" class="row">
     </div>
 </div>
 {% endblock %}
@@ -22,15 +20,18 @@
     <script>
         $(function () {
             $('#project-tree').jstree({
-                "core" : {
-                    "themes" : {
-                        "variant" : "large"
+                core : {
+                    animation :0,
+                    check_callback: true,
+                    themes : {
+                        variant : "large",
+                        stripes : true,
                     },
-                    "data": {
-                        "url": function(node) {
+                    data: {
+                        url: function(node) {
                             return "{% url "folder-list" %}";
                         },
-                        "success": function(result) {
+                        success: function(result) {
                             projects = [];
                             result.forEach((folder) => {
                                 folder.text = folder.name;
@@ -42,7 +43,6 @@
                                     child.project_id = child.id;
                                     child.id = "p" + child.id;
                                     child.text = child.name;
-                                    child.type = "file";
                                     child.icon = "{% static "cc/images/favicon/favicon-16x16.png" %}"
                                     projects.push(child);
                                 });
@@ -53,6 +53,10 @@
                         },
                     },
                 },
+                plugins : [
+                    "contextmenu", "dnd", "search",
+                    "state", "types", "wholerow"
+                ],
             });
         });
     </script>

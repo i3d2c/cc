@@ -15,8 +15,7 @@
 
         <title>{% block title %}CC{% endblock %}</title>
 
-        <link href="{% static "cc/css/theme.css" %}" rel="stylesheet" />
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/js/all.min.js" crossorigin="anonymous"></script>
+        <link href="{% static "cc/css/theme.min.css" %}" rel="stylesheet" />
     </head>
     <body {% block body_attributes %}{% endblock %}>
 
@@ -25,7 +24,7 @@
 
         <script src="https://code.jquery.com/jquery-3.4.1.min.js" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
-        <script src="{% static "cc/js/theme.js" %}"></script>
+        <script src="{% static "cc/js/theme.min.js" %}"></script>
 
         {% block extra_js %}
         {% endblock %}
