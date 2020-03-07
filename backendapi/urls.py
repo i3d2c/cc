@@ -5,18 +5,16 @@ from rest_framework import routers, serializers, viewsets
 from rest_framework import permissions
 
 # Serializers define the API representation.
-class ProjectSerializer(serializers.HyperlinkedModelSerializer):
+class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
-        fields = ['id', 'name', 'content', 'infos', 'actions']
+        fields = ['id', 'name', 'content', 'infos', 'actions', 'folder']
 
 
 class FolderSerializer(serializers.ModelSerializer):
-    project_set = ProjectSerializer(many=True, read_only=False)
-
     class Meta:
         model = Folder
-        fields = ['id', 'name', 'parent', 'project_set']
+        fields = ['id', 'name', 'parent']
         # id, name & parent are fields used by jstree in frontend
 
 

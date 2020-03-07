@@ -17,50 +17,64 @@
 {% endblock %}
 
 {% block extra_js %}
-    <script>
-        $(function () {
-            $('#project-tree').jstree({
-                core : {
-                    animation :0,
-                    check_callback: true,
-                    themes : {
-                        variant : "large",
-                        stripes : true,
-                    },
-                    data: {
-                        url: function(node) {
-                            return "{% url "folder-list" %}";
-                        },
-                        success: function(result) {
-                            projects = [];
-                            result.forEach((folder) => {
-                                folder.text = folder.name;
-                                if (folder.parent == null) {
-                                    folder.parent = "#";
-                                }
-                                folder.project_set.forEach((child) => {
-                                    child.parent = folder.id;
-                                    child.project_id = child.id;
-                                    child.id = "p" + child.id;
-                                    child.text = child.name;
-                                    child.icon = "{% static "cc/images/favicon/favicon-16x16.png" %}"
-                                    projects.push(child);
+<script>
+    $(function () {
+        const FolderCollection = Backbone.Collection.extend({
+            url: "{% url "folder-list" %}"
+        });
+        const ProjectCollection = Backbone.Collection.extend({
+            url: "{% url "project-list" %}"
+        });
+
+        let folders = new FolderCollection();
+        let projects = new ProjectCollection();
+
+        $('#project-tree').jstree({
+            core : {
+                animation :0,
+                check_callback: true,
+                themes : {
+                    variant : "large",
+                    stripes : true,
+                },
+                data: (obj, callback) => {
+                    const nodes = [];
+                    folders.fetch({
+                        success: (collection) => {
+                            collection.forEach((folder) => {
+                                nodes.push({
+                                    id: folder.cid,
+                                    text: folder.get("name"),
+                                    parent: folder.get("parent") ? collection.get(folder.get("parent")).cid : "#",
                                 });
                             });
-                            projects.forEach((project) => {
-                                result.push(project);
+                            projects.fetch({
+                                success: (collection) => {
+                                    collection.forEach((project) => {
+                                        nodes.push({
+                                            id: project.cid,
+                                            text: project.get("name"),
+                                            parent: folders.get(project.get("folder")).cid,
+                                            icon: "{% static "cc/images/favicon/favicon-16x16.png" %}",
+                                        });
+                                    });
+                                    callback.call(this, nodes);
+                                }
                             });
-                        },
-                    },
+                        }
+                    });
                 },
-                plugins : [
-                    "contextmenu", "dnd", "search",
-                    "state", "types", "wholerow"
-                ],
-            });
+            },
+            plugins : [
+                "contextmenu", "dnd", "search",
+                "state", "types", "wholerow"
+            ],
         });
-    </script>
+    });
+</script>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
+<script src="{% static "cc/js/underscore.min.js" %}"></script>
+<script src="{% static "cc/js/backbone.min.js" %}"></script>
 {% endblock %}
