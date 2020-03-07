@@ -38,7 +38,6 @@
                                     folder.parent = "#";
                                 }
                                 folder.project_set.forEach((child) => {
-                                    console.log(child);
                                     child.parent = folder.id;
                                     child.project_id = child.id;
                                     child.id = "p" + child.id;
@@ -48,11 +47,9 @@
                                     projects.push(child);
                                 });
                             });
-                            console.log(projects);
                             projects.forEach((project) => {
                                 result.push(project);
                             });
-                            console.log(result);
                         },
                     },
                 },
