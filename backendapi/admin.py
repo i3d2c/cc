@@ -2,6 +2,15 @@ from django.contrib import admin
 
 from .models import Folder, Project, Category
 
-admin.site.register(Folder)
-admin.site.register(Project)
+class FolderAdmin(admin.ModelAdmin):
+    list_display = ('name', 'id', 'active', 'archived')
+    list_editable = ('active', 'archived')
+
+class ProjectAdmin(admin.ModelAdmin):
+    list_display = ('name', 'id', 'active', 'archived')
+    list_editable = ('active', 'archived')
+
+admin.site.register(Folder, FolderAdmin)
+admin.site.register(Project, ProjectAdmin)
 admin.site.register(Category)
+

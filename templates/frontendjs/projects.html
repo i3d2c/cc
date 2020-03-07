@@ -14,11 +14,21 @@
     <div id="project-tree" class="row">
     </div>
 </div>
+
 {% endblock %}
 
 {% block extra_js %}
+{% csrf_token %}
 <script>
     $(function () {
+        const oldSync = Backbone.sync;
+        Backbone.sync = function(method, model, options){
+            options.beforeSend = function(xhr){
+                xhr.setRequestHeader('X-CSRFToken', Cookies.get('csrftoken'));
+            };
+            return oldSync(method, model, options);
+        };
+
         const FolderCollection = Backbone.Collection.extend({
             url: "{% url "folder-list" %}"
         });
@@ -46,6 +56,7 @@
                                     id: folder.cid,
                                     text: folder.get("name"),
                                     parent: folder.get("parent") ? collection.get(folder.get("parent")).cid : "#",
+                                    is_folder: true,
                                 });
                             });
                             projects.fetch({
@@ -56,6 +67,7 @@
                                             text: project.get("name"),
                                             parent: folders.get(project.get("folder")).cid,
                                             icon: "{% static "cc/images/favicon/favicon-16x16.png" %}",
+                                            id_folder: false,
                                         });
                                     });
                                     callback.call(this, nodes);
@@ -66,9 +78,40 @@
                 },
             },
             plugins : [
-                "contextmenu", "dnd", "search",
-                "state", "types", "wholerow"
+                "contextmenu",
+                //other plugins available : "dnd", "search", "state", "types", "wholerow"
             ],
+            contextmenu: {
+                items: (node, callback) => {
+                    const result = {};
+                    if (node.original.is_folder) {
+                        result.new = {
+                            label: "Nouveau",
+                            submenu: {
+                                folder: {
+                                    label: "Dossier",
+                                },
+                                project: {
+                                    label: "Projet",
+                                },
+                            },
+                        };
+                    }
+                    result.delete = {
+                        label: "Supprimer",
+                        action: () => {
+                            if (node.original.is_folder) {
+                                folders.get(node.id).destroy();
+                            } else {
+                                projects.get(node.id).destroy();
+                            }
+                            const tree = $('#project-tree').jstree(true);
+                            tree.delete_node(node);
+                        },
+                    };
+                    return result;
+                },
+            },
         });
     });
 </script>
@@ -77,4 +120,5 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
 <script src="{% static "cc/js/underscore.min.js" %}"></script>
 <script src="{% static "cc/js/backbone.min.js" %}"></script>
+<script src="{% static "cc/js/js.cookie-2.2.1.min.js" %}"></script>
 {% endblock %}
