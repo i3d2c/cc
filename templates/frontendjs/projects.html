@@ -28,7 +28,31 @@
                     },
                     "data": {
                         "url": function(node) {
-                            return "{% url "front-projects" %}";
+                            return "{% url "folder-list" %}";
+                        },
+                        "success": function(result) {
+                            projects = [];
+                            result.forEach((folder) => {
+                                folder.text = folder.name;
+                                if (folder.parent == null) {
+                                    folder.parent = "#";
+                                }
+                                folder.project_set.forEach((child) => {
+                                    console.log(child);
+                                    child.parent = folder.id;
+                                    child.project_id = child.id;
+                                    child.id = "p" + child.id;
+                                    child.text = child.name;
+                                    child.type = "file";
+                                    child.icon = "{% static "cc/images/favicon/favicon-16x16.png" %}"
+                                    projects.push(child);
+                                });
+                            });
+                            console.log(projects);
+                            projects.forEach((project) => {
+                                result.push(project);
+                            });
+                            console.log(result);
                         },
                     },
                 },
