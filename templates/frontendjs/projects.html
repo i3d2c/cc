@@ -21,6 +21,7 @@
 {% csrf_token %}
 <script>
     $(function () {
+        // Configuration : add authentication to ajax queries
         const oldSync = Backbone.sync;
         Backbone.sync = function(method, model, options){
             options.beforeSend = function(xhr){
@@ -29,15 +30,128 @@
             return oldSync(method, model, options);
         };
 
-        const FolderCollection = Backbone.Collection.extend({
-            url: "{% url "folder-list" %}"
+        // Models
+        const DjangoModel = Backbone.Model.extend({
+            // Add trailing slash at end of urls
+            url: function() {
+                const origUrl = Backbone.Model.prototype.url.call(this);
+                return origUrl + (origUrl.charAt(origUrl.length - 1) == '/' ? '' : '/');
+            }
         });
+        const Folder = DjangoModel.extend({});
+        const FolderCollection = Backbone.Collection.extend({
+            model: Folder,
+            url: "{% url "folder-list" %}",
+        });
+
+        const Project = DjangoModel.extend({});
         const ProjectCollection = Backbone.Collection.extend({
-            url: "{% url "project-list" %}"
+            model: Project,
+            url: "{% url "project-list" %}",
         });
 
         let folders = new FolderCollection();
         let projects = new ProjectCollection();
+
+        // Functions
+        function fillCollections(obj, callback) {
+            const nodes = [];
+            $.when(folders.fetch(), projects.fetch())
+                .done(() => {
+                    folders.forEach((folder) => {
+                        nodes.push({
+                            id: folder.cid,
+                            text: folder.get("name"),
+                            parent: folder.get("parent") ? folders.get(folder.get("parent")).cid : "#",
+                            is_folder: true,
+                        });
+                    });
+                    projects.forEach((project) => {
+                        nodes.push({
+                            id: project.cid,
+                            text: project.get("name"),
+                            parent: folders.get(project.get("folder")).cid,
+                            icon: "{% static "cc/images/favicon/favicon-16x16.png" %}",
+                            is_folder: false,
+                        });
+                    });
+                    callback.call(this, nodes);
+                });
+        }
+
+        function createFolder(node) {
+            folder = new Folder({
+                name: "nouveau dossier",
+                parent: folders.get(node.id).id, // node.id === folder.cid
+            });
+            folders.add(folder);
+            folder.save(null, {
+                success: () => {
+                    const tree = $('#project-tree').jstree(true);
+                    id = tree.create_node(node, {
+                        id: folder.cid,
+                        text: folder.get("name"),
+                        is_folder: true,
+                    });
+                    tree.edit(id);
+                },
+            });
+        }
+
+        function createProject(node) {
+            project = new Project({
+                name: "nouveau projet",
+                folder: folders.get(node.id).id, // node.id === folder.cid
+            });
+            projects.add(project);
+            project.save(null, {
+                success: () => {
+                    const tree = $('#project-tree').jstree(true);
+                    id = tree.create_node(node, {
+                        id: project.cid,
+                        text: project.get("name"),
+                        icon: "{% static "cc/images/favicon/favicon-16x16.png" %}",
+                        is_folder: false,
+                    });
+                    tree.edit(id);
+                },
+            });
+        }
+
+        function deleteNode(node) {
+            const collection = node.original.is_folder ? folders : projects;
+            collection.get(node.id).destroy();
+            const tree = $('#project-tree').jstree(true);
+            tree.delete_node(node);
+        }
+
+        function renameNode(node, text) {
+            const collection = node.original.is_folder ? folders : projects;
+            modelNode = collection.get(node.id);
+            modelNode.set("name", text);
+            modelNode.save();
+        }
+
+        function moveNode(node, parent) {
+            const tree = $('#project-tree').jstree(true);
+            parent = tree.get_node(parent);
+            if (! parent.original.is_folder) {
+                tree.move_node(node, parent.parent);
+                return;
+            }
+            parent_folder = folders.get(parent.id);
+            console.log(parent);
+            console.log(parent_folder);
+            if (node.original.is_folder) {
+                folder = folders.get(node.id);
+                folder.set("parent", parent_folder.get("id")); // parent.id = model.cid
+                folder.save();
+            } else {
+                project = projects.get(node.id);
+                project.set("folder", parent_folder.get("id")); // parent.id = model.cid
+                project.save();
+            }
+        }
 
         $('#project-tree').jstree({
             core : {
@@ -47,39 +161,11 @@
                     variant : "large",
                     stripes : true,
                 },
-                data: (obj, callback) => {
-                    const nodes = [];
-                    folders.fetch({
-                        success: (collection) => {
-                            collection.forEach((folder) => {
-                                nodes.push({
-                                    id: folder.cid,
-                                    text: folder.get("name"),
-                                    parent: folder.get("parent") ? collection.get(folder.get("parent")).cid : "#",
-                                    is_folder: true,
-                                });
-                            });
-                            projects.fetch({
-                                success: (collection) => {
-                                    collection.forEach((project) => {
-                                        nodes.push({
-                                            id: project.cid,
-                                            text: project.get("name"),
-                                            parent: folders.get(project.get("folder")).cid,
-                                            icon: "{% static "cc/images/favicon/favicon-16x16.png" %}",
-                                            id_folder: false,
-                                        });
-                                    });
-                                    callback.call(this, nodes);
-                                }
-                            });
-                        }
-                    });
-                },
+                data: fillCollections,
             },
             plugins : [
-                "contextmenu",
-                //other plugins available : "dnd", "search", "state", "types", "wholerow"
+                "contextmenu", "dnd",
+                //other plugins available : "search", "state", "types", "wholerow"
             ],
             contextmenu: {
                 items: (node, callback) => {
@@ -90,29 +176,37 @@
                             submenu: {
                                 folder: {
                                     label: "Dossier",
+                                    action: () => { createFolder(node); }
                                 },
                                 project: {
                                     label: "Projet",
+                                    action: () => { createProject(node); }
                                 },
                             },
                         };
                     }
                     result.delete = {
                         label: "Supprimer",
+                        action: () => { deleteNode(node); },
+                    };
+                    result.rename = {
+                        label: "Renommer",
                         action: () => {
-                            if (node.original.is_folder) {
-                                folders.get(node.id).destroy();
-                            } else {
-                                projects.get(node.id).destroy();
-                            }
                             const tree = $('#project-tree').jstree(true);
-                            tree.delete_node(node);
-                        },
+                            tree.edit(node);
+                        }
                     };
                     return result;
                 },
             },
+            dnd: {
+                copy: false,
+            },
         });
+        // EVENTS
+        $('#project-tree')
+            .on('rename_node.jstree', (e, data) => { renameNode(data.node, data.text); })
+            .on('move_node.jstree', (e, data) => { moveNode(data.node, data.parent); })
     });
 </script>
 

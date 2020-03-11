@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.postgres.fields import JSONField
 
 class Folder(models.Model):
-    name = models.CharField(max_length=64, unique=True)
+    name = models.CharField(max_length=64, unique=False)
     parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
     archived = models.BooleanField(default=False)
     active = models.BooleanField(default=True)
