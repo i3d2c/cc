@@ -142,11 +142,11 @@
             parent_folder = folders.get(parent.id);
             if (node.original.is_folder) {
                 folder = folders.get(node.id);
-                folder.set("parent", parent_folder.get("id")); // parent.id = model.cid
+                folder.set("parent", parent_folder.get("id")); //!\ parent.id = model.cid
                 folder.save();
             } else {
                 project = projects.get(node.id);
-                project.set("folder", parent_folder.get("id")); // parent.id = model.cid
+                project.set("folder", parent_folder.get("id")); //!\ parent.id = model.cid
                 project.save();
             }
         }
@@ -205,6 +205,14 @@
         $('#project-tree')
             .on('rename_node.jstree', (e, data) => { renameNode(data.node, data.text); })
             .on('move_node.jstree', (e, data) => { moveNode(data.node, data.parent); })
+            .on('dblclick.jstree', (e, data) => { 
+                const tree = $('#project-tree').jstree(true);
+                const selected_node = tree.get_node(tree.get_selected());
+                if (! selected_node.original.is_folder) {
+                    const project = projects.get(selected_node.id);
+                    window.location.assign("{% url "front-projects" %}" + project.id + "/");
+                }
+            })
     });
 </script>
 
