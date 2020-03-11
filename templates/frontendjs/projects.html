@@ -70,7 +70,7 @@
                         nodes.push({
                             id: project.cid,
                             text: project.get("name"),
-                            parent: folders.get(project.get("folder")).cid,
+                            parent: project.get("folder") ? folders.get(project.get("folder")).cid : "#",
                             icon: "{% static "cc/images/favicon/favicon-16x16.png" %}",
                             is_folder: false,
                         });
@@ -135,18 +135,20 @@
         function moveNode(node, parent) {
             const tree = $('#project-tree').jstree(true);
             parent = tree.get_node(parent);
-            if (! parent.original.is_folder) {
+            if (parent.original && ! parent.original.is_folder) {
                 tree.move_node(node, parent.parent);
                 return;
             }
-            parent_folder = folders.get(parent.id);
+            const parent_folder = folders.get(parent.id);
+            //!\ parent.id = model.cid
+            const parent_id = parent_folder ? parent_folder.get("id") : null;
             if (node.original.is_folder) {
                 folder = folders.get(node.id);
-                folder.set("parent", parent_folder.get("id")); //!\ parent.id = model.cid
+                folder.set("parent", parent_id); 
                 folder.save();
             } else {
                 project = projects.get(node.id);
-                project.set("folder", parent_folder.get("id")); //!\ parent.id = model.cid
+                project.set("folder", parent_id); //!\ parent.id = model.cid
                 project.save();
             }
         }
