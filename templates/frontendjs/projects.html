@@ -140,8 +140,6 @@
                 return;
             }
             parent_folder = folders.get(parent.id);
-            console.log(parent);
-            console.log(parent_folder);
             if (node.original.is_folder) {
                 folder = folders.get(node.id);
                 folder.set("parent", parent_folder.get("id")); // parent.id = model.cid
