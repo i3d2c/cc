@@ -19,21 +19,9 @@ class FolderSerializer(serializers.ModelSerializer):
         # id, name & parent are fields used by jstree in frontend
 
 
-class UnDestroyableViewSet(viewsets.ModelViewSet):
-
-    def destroy(self, request, *args, **kwargs):
-        try:
-            instance = self.get_object()
-            instance.active = False
-            instance.save()
-        except Http404:
-            pass
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
 # ViewSets define the view behavior.
-class ProjectViewSet(UnDestroyableViewSet):
-    queryset = Project.objects.filter(active=True)
+class ProjectViewSet(viewsets.ModelViewSet):
+    queryset = Project.objects.filter()
     serializer_class = ProjectSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -41,8 +29,8 @@ class ProjectViewSet(UnDestroyableViewSet):
         serializer.save(owner=self.request.user)
 
 
-class FolderViewSet(UnDestroyableViewSet):
-    queryset = Folder.objects.filter(active=True)
+class FolderViewSet(viewsets.ModelViewSet):
+    queryset = Folder.objects.filter()
     serializer_class = FolderSerializer
     permission_classes = [permissions.IsAuthenticated]
 

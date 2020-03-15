@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 
     'widget_tweaks', # bootsrap widget in django
     'rest_framework', # self explanatory
+    'reversion', # provides version control for model instances
 
     'backendapi',
     'frontendjs',

@@ -1,18 +1,21 @@
 from django.contrib import admin
 
 from .models import Folder, Project, Category
+from reversion.admin import VersionAdmin
 
-class FolderAdmin(admin.ModelAdmin):
-    list_display = ('name', 'id', 'active', 'archived')
-    list_editable = ('active', 'archived')
-    list_filter = ('active', 'archived')
 
-class ProjectAdmin(admin.ModelAdmin):
-    list_display = ('name', 'id', 'active', 'archived')
-    list_editable = ('active', 'archived')
-    list_filter = ('active', 'archived')
+@admin.register(Folder)
+class FolderAdmin(VersionAdmin):
+    list_display = ('name', 'id', 'owner', 'parent')
+    #list_editable = ('name', 'id')
+    list_filter = ('owner',)
 
-admin.site.register(Folder, FolderAdmin)
-admin.site.register(Project, ProjectAdmin)
-admin.site.register(Category)
+@admin.register(Project)
+class ProjectAdmin(VersionAdmin):
+    list_display = ('name', 'id', 'owner', 'folder')
+    #list_editable = ('name', 'id')
+    list_filter = ('owner',)
 
+@admin.register(Category)
+class CategoryAdmin(VersionAdmin):
+    pass
